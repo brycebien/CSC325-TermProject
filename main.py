@@ -40,13 +40,24 @@ print("X_test shape: ", X_test.shape)
 knn = NearestNeighbors(n_neighbors=5)
 knn.fit(X_train)
 
-predicted_neighbors = knn.kneighbors(X_test)
-neighbor_indices = predicted_neighbors[1][0]
+# predicted_neighbors = knn.kneighbors(X_test)
+# neighbor_indices = predicted_neighbors[1][0]
 
+
+# giving a specific song to the model
+
+song = X_test.iloc[100] # set this value to the song that you want to give the model
+song_values = song.values.reshape(1, -1) # reshape the values to a 2D array
+
+song_df = pd.DataFrame(song_values, columns=X_test.columns) # create a dataframe from the values
+
+predicted_neighbors = knn.kneighbors(song_df) # get the nearest neighbors of the song
+neighbor_indices = predicted_neighbors[1][0] # get the indices of the nearest neighbors
 print('Similar tracks to the chosen song indicies: ', neighbor_indices, '\n-----------------------------------')
 
+
 print('Selected track info:')
-print(df.iloc[int(X_test.iloc[0]['Unnamed: 0'])-1])
+print(df.iloc[int(song['Unnamed: 0'])-1])
 print('-----------------------------------')
 print('Similar songs to the selected track:')
 
@@ -54,8 +65,9 @@ print('Track Name\tDanceability\tEnergy\tLoudness\tSpeechiness\tAcousticness\tIn
 for i in range (5):
   print(df.iloc[neighbor_indices[i]]['track_name'],'\t', df.iloc[neighbor_indices[i]]['danceability'],'\t', df.iloc[neighbor_indices[i]]['energy'], '\t', df.iloc[neighbor_indices[i]]['loudness'], '\t', df.iloc[neighbor_indices[i]]['speechiness'], '\t', df.iloc[neighbor_indices[i]]['acousticness'], '\t', df.iloc[neighbor_indices[i]]['instrumentalness'], '\t', df.iloc[neighbor_indices[i]]['liveness'], '\t', df.iloc[neighbor_indices[i]]['valence'])
 
-
 #testing similarity matematically
+print('\nTesting Similarity Matematically')
+print('-----------------------------------')
 print('Distance from the given song for each of the 5 selected tracks')
 for i in range (5):
   print(predicted_neighbors[0][0][i])
