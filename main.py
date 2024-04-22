@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import NearestNeighbors
+import joblib
 import os
 
 # Get the current working directory
@@ -72,3 +73,6 @@ print('Distance from the given song for each of the 5 selected tracks')
 for i in range (5):
   print(predicted_neighbors[0][0][i])
 print('each of the selected tracks are close to the given track resulting in unique but similar reccomendations')
+
+# Saving the model as .pkl file
+joblib.dump(knn, 'knn_model.pkl')
