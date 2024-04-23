@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
 import joblib
 import os
 
@@ -21,33 +23,56 @@ df.head().sum()
 
 # delete rows with missing values
 df = df.dropna(axis=0)
-#drop columns not needed
-df = df.drop(columns=['tempo'])
-df = df.drop(columns=['popularity'])
-df = df.drop(columns=['duration_ms'])
-df = df.drop(columns=['explicit'])
-df = df.drop(columns=['track_genre'])
+
+
+# #drop columns not needed
+# df = df.drop(columns=['tempo'])
+# df = df.drop(columns=['popularity'])
+# df = df.drop(columns=['duration_ms'])
+# df = df.drop(columns=['explicit'])
+
+# Assign a number to each genre
+df['track_genre'] = df['track_genre'].astype('category').cat.codes
 
 summary_statistics = df.describe()
-summary_statistics
+print(summary_statistics)
 
-X = df[['Unnamed: 0','key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature']]
+# Scaling data with MinMaxScaler
+scaler = MinMaxScaler()
+df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'tempo', 'popularity', 'duration_ms', 'explicit']] = scaler.fit_transform(df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'tempo', 'popularity', 'duration_ms', 'explicit']])
+print('Data after scaling: ')
+print(df.head())
+
+X = df[['Unnamed: 0','key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'track_genre']]
+# X = df[['Unnamed: 0', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'track_genre']] # V2
+# X = df[['Unnamed: 0', 'danceability', 'loudness', 'instrumentalness', 'liveness', 'track_genre']] # V3
+# X = df[['Unnamed: 0','key', 'danceability', 'energy', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'track_genre', 'tempo', 'popularity', 'duration_ms', 'explicit']]
+
 
 X_train, X_test = train_test_split(X, test_size=0.2, random_state=42)
 
 print("X_train shape: ", X_train.shape)
 print("X_test shape: ", X_test.shape)
 
-knn = NearestNeighbors(n_neighbors=5)
-knn.fit(X_train)
+k_values = range(1, 41)
+average_distances = []
 
-# predicted_neighbors = knn.kneighbors(X_test)
-# neighbor_indices = predicted_neighbors[1][0]
+for k in k_values:
+    knn = NearestNeighbors(n_neighbors=k)
+    nbrs = knn.fit(X)
+    distances, indices = nbrs.kneighbors(X)
+    average_distance = distances.mean()
+    average_distances.append(average_distance)
 
+plt.plot(k_values, average_distances)
+plt.xlabel('k')
+plt.ylabel('Average distance')
+plt.title('Elbow Method For Optimal k')
+plt.show()
 
 # giving a specific song to the model
 
-song = X_test.iloc[100] # set this value to the song that you want to give the model
+song = X.iloc[33987] # set this value to the song that you want to give the model
 song_values = song.values.reshape(1, -1) # reshape the values to a 2D array
 
 song_df = pd.DataFrame(song_values, columns=X_test.columns) # create a dataframe from the values
