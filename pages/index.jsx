@@ -8,6 +8,8 @@ export default function Home() {
   const [resultsDisplay, setResultsDisplay] = useState(null);
   const [selectedTrack, setSelectedTrack] = useState(null);
   const [selectedTrackFeatures, setSelectedTrackFeatures] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  const [reccData, setReccData] = useState([]);
 
   async function searchItem(searchTerm, itemType) {
     if (session && session.accessToken && searchTerm) {
@@ -25,6 +27,7 @@ export default function Home() {
   }
 
   async function handleItemClick(itemId) {
+    setReccData(null);
     const selectedTrack = searchResults.find((track) => track.id === itemId);
     setSelectedTrack(selectedTrack);
     if (session && session.accessToken) {
@@ -41,8 +44,10 @@ export default function Home() {
       document.getElementById("my_modal_3").close();
     }
   }
+
   useEffect(() => {
     if (selectedTrackFeatures) {
+      console.log(selectedTrackFeatures);
       fetch("http://localhost:5000/receive_data", {
         method: "POST",
         headers: {
@@ -50,10 +55,30 @@ export default function Home() {
         },
         body: JSON.stringify(selectedTrackFeatures),
       })
-        .then((response) => response.text()) // convert the response to text
-        .then((text) => console.log(text));
+        .then((response) => response.json())
+        .then((data) => setRecommendations(data));
     }
   }, [selectedTrackFeatures]);
+
+  useEffect(() => {
+    if (recommendations && recommendations.length > 0) {
+      if (session && session.accessToken) {
+        fetch(
+          `https://api.spotify.com/v1/tracks?ids=${recommendations.join(",")}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.accessToken}`,
+            },
+          }
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            setReccData(data.tracks);
+          });
+      }
+    }
+  }, [recommendations]);
 
   useEffect(() => {
     if (searchResults && searchResults.length > 0) {
@@ -105,9 +130,15 @@ export default function Home() {
     }
   }, [searchResults]);
 
+  function logTrackData() {
+    console.log(recommendations);
+    console.log(reccData);
+  }
+
   return (
     <main>
       <NavBar />
+      <button onClick={logTrackData}>what</button>
       <div className="pt-20 pl-20 pr-20">
         <div className="flex flex-col">
           <div className="table-container">
@@ -115,7 +146,7 @@ export default function Home() {
               className="btn"
               onClick={() => document.getElementById("my_modal_3").showModal()}
             >
-              Select Track to Get Recommendations
+              Search and Choose Track to Get Recommendations
             </button>
             <dialog
               id="my_modal_3"
@@ -201,6 +232,53 @@ export default function Home() {
                         </div>
                       </th>
                     </tr>
+                  </tbody>
+                </table>
+              </>
+            )}
+            {reccData && (
+              <>
+                <div className="font-bold pt-20">Recommendations:</div>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th className="text-left px-12"></th>
+                      <th className="text-left px-12">Track</th>
+                      <th className="text-left px-12">Artist</th>
+                      <th className="text-left px-12">Album</th>
+                      <th className="text-left px-12"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reccData.map((track, index) => (
+                      <tr key={index} onClick={() => handleItemClick(track.id)}>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div className="avatar">
+                              <div className="w-12 h-12">
+                                <img
+                                  src={
+                                    track.album
+                                      ? track.album.images[0].url
+                                      : "https://upload.wikimedia.org/wikipedia/commons/b/b5/Windows_10_Default_Profile_Picture.svg"
+                                  }
+                                  alt="album_img"
+                                />
+                              </div>
+                            </div>
+                            <div className="font-bold">{track.name}</div>
+                          </div>
+                        </td>
+                        <th>
+                          <div className="font-bold">
+                            {track.artists[0].name}
+                          </div>
+                        </th>
+                        <th>
+                          <div className="font-bold">{track.album.name}</div>
+                        </th>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </>
