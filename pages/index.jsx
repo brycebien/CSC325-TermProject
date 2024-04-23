@@ -5,8 +5,9 @@ import React, { useEffect, useState, useCallback } from "react";
 export default function Home() {
   const { data: session } = useSession();
   const [searchResults, setSearchResults] = useState([]);
-  const [resultsDisplay, setResultsDisplay] = React.useState(null);
-  const [selectedTrack, setSelectedTrack] = React.useState(null);
+  const [resultsDisplay, setResultsDisplay] = useState(null);
+  const [selectedTrack, setSelectedTrack] = useState(null);
+  const [selectedTrackFeatures, setSelectedTrackFeatures] = useState(null);
 
   async function searchItem(searchTerm, itemType) {
     if (session && session.accessToken && searchTerm) {
@@ -23,12 +24,23 @@ export default function Home() {
     }
   }
 
-  const handleItemClick = (itemId) => {
+  async function handleItemClick(itemId) {
     const selectedTrack = searchResults.find((track) => track.id === itemId);
     setSelectedTrack(selectedTrack);
-    setSearchResults([]);
-    document.getElementById("my_modal_3").close();
-  };
+    if (session && session.accessToken) {
+      const response = await fetch(
+        `https://api.spotify.com/v1/audio-features/${itemId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+        }
+      );
+      setSearchResults([]);
+      setSelectedTrackFeatures(await response.json());
+      document.getElementById("my_modal_3").close();
+    }
+  }
 
   useEffect(() => {
     if (searchResults && searchResults.length > 0) {
@@ -83,14 +95,14 @@ export default function Home() {
   return (
     <main>
       <NavBar />
-      <div className="pt-5 pl-20 pr-20">
+      <div className="pt-20 pl-20 pr-20">
         <div className="flex flex-col">
           <div className="table-container">
             <button
               className="btn"
               onClick={() => document.getElementById("my_modal_3").showModal()}
             >
-              Select Track
+              Select Track to Get Recommendations
             </button>
             <dialog
               id="my_modal_3"
@@ -134,48 +146,51 @@ export default function Home() {
               </div>
             </dialog>
             {selectedTrack && (
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th className="text-left px-12"></th>
-                    <th className="text-left px-12">Track</th>
-                    <th className="text-left px-12">Artist</th>
-                    <th className="text-left px-12">Album</th>
-                    <th className="text-left px-12"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <div className="avatar">
-                          <div className="w-12 h-12">
-                            <img
-                              src={
-                                selectedTrack.album
-                                  ? selectedTrack.album.images[0].url
-                                  : "https://upload.wikimedia.org/wikipedia/commons/b/b5/Windows_10_Default_Profile_Picture.svg"
-                              }
-                              alt="album_img"
-                            />
+              <>
+                <div className="font-bold pt-20">Selected Track:</div>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th className="text-left px-12"></th>
+                      <th className="text-left px-12">Track</th>
+                      <th className="text-left px-12">Artist</th>
+                      <th className="text-left px-12">Album</th>
+                      <th className="text-left px-12"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div className="flex items-center gap-3">
+                          <div className="avatar">
+                            <div className="w-12 h-12">
+                              <img
+                                src={
+                                  selectedTrack.album
+                                    ? selectedTrack.album.images[0].url
+                                    : "https://upload.wikimedia.org/wikipedia/commons/b/b5/Windows_10_Default_Profile_Picture.svg"
+                                }
+                                alt="album_img"
+                              />
+                            </div>
                           </div>
+                          <div className="font-bold">{selectedTrack.name}</div>
                         </div>
-                        <div className="font-bold">{selectedTrack.name}</div>
-                      </div>
-                    </td>
-                    <th>
-                      <div className="font-bold">
-                        {selectedTrack.artists[0].name}
-                      </div>
-                    </th>
-                    <th>
-                      <div className="font-bold">
-                        {selectedTrack.album.name}
-                      </div>
-                    </th>
-                  </tr>
-                </tbody>
-              </table>
+                      </td>
+                      <th>
+                        <div className="font-bold">
+                          {selectedTrack.artists[0].name}
+                        </div>
+                      </th>
+                      <th>
+                        <div className="font-bold">
+                          {selectedTrack.album.name}
+                        </div>
+                      </th>
+                    </tr>
+                  </tbody>
+                </table>
+              </>
             )}
           </div>
         </div>
