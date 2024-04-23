@@ -24,13 +24,6 @@ df.head().sum()
 # delete rows with missing values
 df = df.dropna(axis=0)
 
-
-# #drop columns not needed
-# df = df.drop(columns=['tempo'])
-# df = df.drop(columns=['popularity'])
-# df = df.drop(columns=['duration_ms'])
-# df = df.drop(columns=['explicit'])
-
 # Assign a number to each genre
 df['track_genre'] = df['track_genre'].astype('category').cat.codes
 
@@ -44,10 +37,6 @@ print('Data after scaling: ')
 print(df.head())
 
 X = df[['Unnamed: 0','key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'track_genre']]
-# X = df[['Unnamed: 0', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'track_genre']] # V2
-# X = df[['Unnamed: 0', 'danceability', 'loudness', 'instrumentalness', 'liveness', 'track_genre']] # V3
-# X = df[['Unnamed: 0','key', 'danceability', 'energy', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'track_genre', 'tempo', 'popularity', 'duration_ms', 'explicit']]
-
 
 X_train, X_test = train_test_split(X, test_size=0.2, random_state=42)
 
@@ -80,7 +69,6 @@ song_df = pd.DataFrame(song_values, columns=X_test.columns) # create a dataframe
 predicted_neighbors = knn.kneighbors(song_df) # get the nearest neighbors of the song
 neighbor_indices = predicted_neighbors[1][0] # get the indices of the nearest neighbors
 print('Similar tracks to the chosen song indicies: ', neighbor_indices, '\n-----------------------------------')
-
 
 print('Selected track info:')
 print(df.iloc[int(song['Unnamed: 0'])-1])
