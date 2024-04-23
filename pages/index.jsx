@@ -130,15 +130,9 @@ export default function Home() {
     }
   }, [searchResults]);
 
-  function logTrackData() {
-    console.log(recommendations);
-    console.log(reccData);
-  }
-
   return (
     <main>
       <NavBar />
-      <button onClick={logTrackData}>what</button>
       <div className="pt-20 pl-20 pr-20">
         <div className="flex flex-col">
           <div className="table-container">
