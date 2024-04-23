@@ -2,18 +2,16 @@ import joblib
 import pandas as pd
 import os
 from flask import Flask, request
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/receive_data', methods=['POST'])
 def receive_data():
     data = request.json
-    # process data
+    print(data)
     return 'Success!', 200
-
-
-if __name__ == '__main__':
-    app.run(port=5000)
 
 knn = joblib.load('knn_model.pkl')
 
@@ -41,4 +39,6 @@ print('\n\nSimilar Tracks:')
 for i in range(5):
     print(df.iloc[neighbor_indices[i]]['track_name'], "-----------------------------", df.iloc[neighbor_indices[i]]['track_id'], "\n", df.iloc[neighbor_indices[i]]['artists'], '  ', df.iloc[neighbor_indices[i]]['track_genre'])
 
-
+if __name__ == '__main__':
+    app.run(port=5000)
+    print('running...')

@@ -39,17 +39,21 @@ export default function Home() {
       setSearchResults([]);
       setSelectedTrackFeatures(await response.json());
       document.getElementById("my_modal_3").close();
-      if (selectedTrackFeatures) {
-        fetch("http://localhost:5000/receive_data", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(selectedTrackFeatures),
-        });
-      }
     }
   }
+  useEffect(() => {
+    if (selectedTrackFeatures) {
+      fetch("http://localhost:5000/receive_data", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(selectedTrackFeatures),
+      })
+        .then((response) => response.text()) // convert the response to text
+        .then((text) => console.log(text));
+    }
+  }, [selectedTrackFeatures]);
 
   useEffect(() => {
     if (searchResults && searchResults.length > 0) {
