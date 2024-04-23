@@ -1,6 +1,19 @@
 import joblib
 import pandas as pd
 import os
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route('/receive_data', methods=['POST'])
+def receive_data():
+    data = request.json
+    # process data
+    return 'Success!', 200
+
+
+if __name__ == '__main__':
+    app.run(port=5000)
 
 knn = joblib.load('knn_model.pkl')
 
