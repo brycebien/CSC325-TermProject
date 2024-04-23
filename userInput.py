@@ -10,34 +10,76 @@ CORS(app)
 @app.route('/receive_data', methods=['POST'])
 def receive_data():
     data = request.json
-    print(data)
-    return 'Success!', 200
+    song = process_data(data)
+    return get_data(song), 200
+
+
+def process_data(data):
+    df = pd.DataFrame([data])
+    song = df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature']].copy()
+    song['Unnamed: 0'] = 0
+    return song
+
+
+def get_data(song):
+    neighbors = knn.kneighbors(song)
+    neighbor_indices = neighbors[1][0]
+
+    cwd = os.getcwd()
+    file_path = os.path.join(cwd, 'data', 'dataset.csv')
+    df = pd.read_csv(file_path)
+
+    df = df.dropna(axis=0)
+
+    df['track_genre'] = df['track_genre'].astype('category').cat.codes
+
+
+    songs = []
+
+    for i in range(5):
+        songs.append(df.iloc[neighbor_indices[i]]['track_id'])
+    return songs
+
+
 
 knn = joblib.load('knn_model.pkl')
 
-cwd = os.getcwd()
-file_path = os.path.join(cwd, 'data', 'dataset.csv')
-df = pd.read_csv(file_path)
 
-df = df.dropna(axis=0)
 
-df['track_genre'] = df['track_genre'].astype('category').cat.codes
 
-X = df[['Unnamed: 0','key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'track_genre']]
 
-user_prediction = X.iloc[44075].values.reshape(1, -1) # get user in here
-prediction_df = pd.DataFrame(user_prediction, columns=X.columns)
 
-# getting songs from the user input
-neighbors = knn.kneighbors(prediction_df)
-neighbor_indices = neighbors[1][0]
 
-print('Selected Track:')
-print(df.iloc[int(prediction_df['Unnamed: 0'].iloc[0])-1]) # TODO: search by song id??
 
-print('\n\nSimilar Tracks:')
-for i in range(5):
-    print(df.iloc[neighbor_indices[i]]['track_name'], "-----------------------------", df.iloc[neighbor_indices[i]]['track_id'], "\n", df.iloc[neighbor_indices[i]]['artists'], '  ', df.iloc[neighbor_indices[i]]['track_genre'])
+
+
+
+
+
+
+# cwd = os.getcwd()
+# file_path = os.path.join(cwd, 'data', 'dataset.csv')
+# df = pd.read_csv(file_path)
+
+# df = df.dropna(axis=0)
+
+# df['track_genre'] = df['track_genre'].astype('category').cat.codes
+
+# X = df[['Unnamed: 0','key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature']]
+
+# user_prediction = X.iloc[44075].values.reshape(1, -1) # get user in here
+# prediction_df = pd.DataFrame(user_prediction, columns=X.columns)
+
+# # getting songs from the user input
+# neighbors = knn.kneighbors(prediction_df)
+# neighbor_indices = neighbors[1][0]
+
+# print('Selected Track:')
+# print(df.iloc[int(prediction_df['Unnamed: 0'].iloc[0])-1]) # TODO: search by song id??
+
+# print('\n\nSimilar Tracks:')
+# for i in range(5):
+#     print(df.iloc[neighbor_indices[i]]['track_name'], "-----------------------------", df.iloc[neighbor_indices[i]]['track_id'], "\n", df.iloc[neighbor_indices[i]]['artists'], '  ', df.iloc[neighbor_indices[i]]['track_genre'])
 
 if __name__ == '__main__':
     app.run(port=5000)

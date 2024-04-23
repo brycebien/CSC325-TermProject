@@ -36,7 +36,7 @@ df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness',
 print('Data after scaling: ')
 print(df.head())
 
-X = df[['Unnamed: 0','key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'track_genre']]
+X = df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'Unnamed: 0']]
 
 X_train, X_test = train_test_split(X, test_size=0.2, random_state=42)
 
