@@ -1,40 +1,36 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
+# Welcome to our Spotify Recommendation App!
 ## Getting Started
 
-First, run the development server:
+IMPORTANT NOTE: You must send your email address to the developer in order to access the app, because it is still in Spotify's "Develop Mode" and users must be approved before using the Spotify API. Send your information to ajoneal02@gmail.com to get added to the list of approved users. If you are Dr. Zhou grading this project, I have provided a test user account for you to use in the comments of our submission.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Running locally
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. First, clone the respository
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+2. Next, you will need a .env.local file. You can either set this up with your own Spotify API client ID and secret. If you are Dr. Zhou grading this project for CSC325, I have included a .env.local file for you in our submission for you to use. The format for the file is:
+> SPOTIFY_CLIENT_ID=spotifyclientid
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+> SPOTIFY_SECRET=spotifysecret
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+> JWT_SECRET=secretencodingstring
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+> NEXTAUTH_URL=http://localhost:3000/
 
-## Learn More
+3. Make sure you have next.js installed, refer to the [official documentation](https://nextjs.org/docs/getting-started/installation) for installation instructions.
 
-To learn more about Next.js, take a look at the following resources:
+4. Install the correct python libraries using pip install:
+> pip install joblib pandas Flask flask-cors
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Run the Python server by running the 'userInput.py' file
+   
+6. In different terminal from where the Python server is running, navigate to the root folder of Amassify
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+7. Run the following commands:
 
-## Deploy on Vercel
+> npm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+> npm run build
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+> npm run start
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
