@@ -190,7 +190,6 @@ export default function Home() {
                   <thead>
                     <tr>
                       <th className="text-left px-12"></th>
-                      <th className="text-left px-12">Track</th>
                       <th className="text-left px-12">Artist</th>
                       <th className="text-left px-12">Album</th>
                       <th className="text-left px-12"></th>
@@ -237,7 +236,6 @@ export default function Home() {
                   <thead>
                     <tr>
                       <th className="text-left px-12"></th>
-                      <th className="text-left px-12">Track</th>
                       <th className="text-left px-12">Artist</th>
                       <th className="text-left px-12">Album</th>
                       <th className="text-left px-12"></th>
@@ -245,7 +243,7 @@ export default function Home() {
                   </thead>
                   <tbody>
                     {reccData.map((track, index) => (
-                      <tr key={index} onClick={() => handleItemClick(track.id)}>
+                      <tr key={index}>
                         <td>
                           <div className="flex items-center gap-3">
                             <div className="avatar">
