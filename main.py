@@ -35,6 +35,9 @@ print(summary_statistics)
 # df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'tempo', 'popularity', 'duration_ms', 'explicit']] = scaler.fit_transform(df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'tempo', 'popularity', 'duration_ms', 'explicit']])
 # print('Data after scaling: ')
 # print(df.head())
+'''
+Scaling data is not needed because the data is close together
+'''
 
 X = df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'tempo']]
 
@@ -46,20 +49,22 @@ print("X_test shape: ", X_test.shape)
 k_values = range(1, 41)
 average_distances = []
 
-# for k in k_values:
-#     knn = NearestNeighbors(n_neighbors=k)
-#     nbrs = knn.fit(X)
-#     distances, indices = nbrs.kneighbors(X)
-#     average_distance = distances.mean()
-#     average_distances.append(average_distance)
-#     print(k)
+# Elbow method to find the optimal k value
+for k in k_values:
+    knn = NearestNeighbors(n_neighbors=k)
+    nbrs = knn.fit(X)
+    distances, indices = nbrs.kneighbors(X)
+    average_distance = distances.mean()
+    average_distances.append(average_distance)
+    print(k)
 
-# plt.plot(k_values, average_distances)
-# plt.xlabel('k')
-# plt.ylabel('Average distance')
-# plt.title('Elbow Method For Optimal k')
-# plt.show()
+plt.plot(k_values, average_distances)
+plt.xlabel('k')
+plt.ylabel('Average distance')
+plt.title('Elbow Method For Optimal k')
+plt.show()
 
+# Train the model with the optimal k value
 knn = NearestNeighbors(n_neighbors=4)
 knn.fit(X)
 

@@ -4,21 +4,25 @@ import os
 from flask import Flask, request
 from flask_cors import CORS
 
-app = Flask(__name__)
-CORS(app)
+app = Flask(__name__) # create an instance of the Flask class for the web app
+CORS(app) # enable Cross-Origin Resource Sharing (CORS) for the web app
 
-@app.route('/receive_data', methods=['POST'])
+@app.route('/receive_data', methods=['POST']) # define the route for the web app
+# This function receives data from the user and returns the recommended songs
 def receive_data():
     data = request.json
+    # Load the k-Nearest Neighbors model from the file
     knn = joblib.load('knn_model.pkl')
 
+    # Load the dataset from the file
     cwd = os.getcwd()
     file_path = os.path.join(cwd, 'data', 'dataset.csv')
     df = pd.read_csv(file_path)
 
+    # delete rows with missing values
     df = df.dropna(axis=0)
 
-    X = df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'tempo']]
+    X = df[['key', 'danceability', 'energy', 'loudness', 'instrumentalness', 'liveness', 'valence', 'time_signature', 'tempo']] # features
 
     #clean input data to match the model
     data_df = pd.DataFrame()
@@ -43,6 +47,7 @@ def receive_data():
     neighbor_indices = neighbors[1][0]
     print(neighbor_indices)
 
+    # getting the songs from the indices
     songs = []
     for i in range(4):
         if df.iloc[neighbor_indices[i]]['track_name'] == df.iloc[neighbor_indices[i-1]]['track_name']:
@@ -50,11 +55,11 @@ def receive_data():
         else:
             songs.append(df.iloc[neighbor_indices[i]]['track_id'])
 
-    print(songs)
+    print(songs) # print the recommended songs
 
-    # print(data)
-    return songs, 200
+    return songs, 200 # return the recommended songs
 
+# Run the web app
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=5000) # run the web app on port 5000
     print('running...')
